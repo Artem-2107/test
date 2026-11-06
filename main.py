@@ -1,7 +1,7 @@
 import sys
 import os
 
-# Говорим Python'у, что наши экраны лежат в папке frontend
+# Добавляем папку frontend в пути поиска, чтобы работали импорты
 sys.path.append(os.path.join(os.path.dirname(__file__), 'frontend'))
 
 import flet as ft
@@ -22,7 +22,7 @@ class App:
         self.page.controls.clear()
         
         try:
-            views = {
+            views_dict = {
                 "login": lambda: login_view.build(self),
                 "register": lambda: register_view.build(self),
                 "catalog": lambda: catalog_view.build(self),
@@ -34,21 +34,24 @@ class App:
                 "favorites": lambda: favorites_view.build(self),
             }
             
-            if name in views:
-                control = views[name]()
+            if name in views_dict:
+                # ИСПРАВЛЕНО: вызываем функцию из словаря, чтобы получить контрол
+                control = views_dict[name]()
                 if control:
                     self.page.controls.append(control)
                 else:
-                    self.page.controls.append(ft.Text(f"Ошибка: экран {name} пуст"))
+                    self.page.controls.append(ft.Text(f"Ошибка: экран {name} пуст", color=ft.Colors.RED))
             else:
-                self.page.controls.append(ft.Text(f"Ошибка: экран {name} не найден"))
+                self.page.controls.append(ft.Text(f"Ошибка: экран {name} не найден", color=ft.Colors.RED))
+                
         except Exception as e:
             self.page.controls.append(
                 ft.Column([
-                    ft.Text("ОШИБКА:", color=ft.Colors.RED, weight=ft.FontWeight.BOLD),
-                    ft.Text(str(e), color=ft.Colors.WHITE)
+                    ft.Text("КРИТИЧЕСКАЯ ОШИБКА:", color=ft.Colors.RED, weight=ft.FontWeight.BOLD, size=20),
+                    ft.Text(str(e), color=ft.Colors.WHITE, selectable=True)
                 ])
             )
+        
         self.page.update()
 
     def ok(self, m):
@@ -68,10 +71,10 @@ def main(page: ft.Page):
         app = App(page)
         app.go("login")
     except Exception as e:
-        page.add(ft.Text(f"Критическая ошибка: {str(e)}", color=ft.Colors.RED))
+        page.add(ft.Text(f"Критическая ошибка при запуске: {str(e)}", color=ft.Colors.RED))
 
 if __name__ == "__main__":
-    # Проверка для разных версий Flet (для ПК и для телефона)
+    # Универсальный запуск для разных версий Flet
     if hasattr(ft, "run"):
         ft.run(main)
     else:

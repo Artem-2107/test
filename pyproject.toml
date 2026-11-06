@@ -1,6 +1,8 @@
 [project]
 name = "sport_life"
 version = "1.0.0"
+description = "Спорт лайф - магазин спортивной одежды"
+dependencies = ["flet==0.25.2", "requests==2.32.3"]
 
 [tool.flet]
 product = "Спорт лайф"
